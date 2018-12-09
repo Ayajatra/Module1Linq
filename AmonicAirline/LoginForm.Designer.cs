@@ -94,6 +94,7 @@
             this.textBoxPassword.Name = "textBoxPassword";
             this.textBoxPassword.Size = new System.Drawing.Size(254, 23);
             this.textBoxPassword.TabIndex = 1;
+            this.textBoxPassword.UseSystemPasswordChar = true;
             // 
             // buttonExit
             // 
@@ -132,6 +133,7 @@
             this.Controls.Add(this.label1);
             this.Name = "LoginForm";
             this.Text = "Login Form";
+            this.Load += new System.EventHandler(this.LoginForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

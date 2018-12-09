@@ -1,10 +1,10 @@
-﻿using System;
+﻿using FormUtilitiesLibrary;
+using HashLibrary;
+using Session1Library;
+using System;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using Session1Library;
-using HashLibrary;
-using FormUtilitiesLibrary;
 
 namespace AmonicAirline
 {
@@ -13,6 +13,17 @@ namespace AmonicAirline
         public LoginForm()
         {
             InitializeComponent();
+        }
+
+        private void LoginForm_Load(object sender, EventArgs e)
+        {
+            // Check apakah terhubung ke server (database) atau tidak
+
+            if (!Connection.IsConnected())
+            {
+                MessageBox.Show("Gagal terhubung ke server!");
+                Application.Exit();
+            }
         }
 
         private void buttonExit_Click(object sender, EventArgs e)
@@ -25,7 +36,7 @@ namespace AmonicAirline
             string username = textBoxUsername.Text;
             string password = textBoxPassword.Text;
             password = Hash.MakeMd5(password);
-            using (Session1Entities session = new Session1Entities())
+            using (var session = new Session1Entities())
             {
                 var query = from u in session.Users
                             where u.Email == username && u.Password == password
@@ -35,6 +46,7 @@ namespace AmonicAirline
                 if (result.Count == 1)
                 {
                     // Sukses Login
+                    // Supaya kalau AdminMainForm ditutup, LoginForm bakal automatis muncul lagi
 
                     ClearFields.ClearTextBoxes(this);
                     var admin = new AdminMainForm();
@@ -48,7 +60,7 @@ namespace AmonicAirline
                 {
                     // Gagal Login
 
-                    MessageBox.Show("Salah Password!");
+                    MessageBox.Show("Salah Username atau Password!");
                     failedLoginAttempt++;
                     CheckLoginAttempt();
                 }
@@ -57,11 +69,12 @@ namespace AmonicAirline
 
         // Check berapa banyak kali gagal login
 
-        Timer timer = new Timer()
+        private Timer timer = new Timer()
         {
             Interval = 1000,
             Enabled = true
         };
+
         private int cooldownTime = 10;
         private int failedLoginAttempt = 0;
 
@@ -75,7 +88,6 @@ namespace AmonicAirline
                 timer.Tick += Timer_Tick;
                 timer.Start();
             }
-
         }
 
         private void Timer_Tick(object sender, EventArgs e)

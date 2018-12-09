@@ -9,6 +9,11 @@ namespace HashLibrary
 {
     public static class Hash
     {
+        /// <summary>
+        /// Create MD5 hash from string.
+        /// </summary>
+        /// <param name="inputText">string that will be converted to MD5 Hash.</param>
+        /// <returns>MD5 string</returns>
         public static string MakeMd5(string inputText)
         {
             MD5 md5 = MD5.Create();
