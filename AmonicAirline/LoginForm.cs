@@ -17,11 +17,11 @@ namespace AmonicAirline
 
         private void LoginForm_Load(object sender, EventArgs e)
         {
-            // Check apakah terhubung ke server (database) atau tidak
+            // Check if connected to server(database) or not
 
             if (!Connection.IsConnected())
             {
-                MessageBox.Show("Gagal terhubung ke server!");
+                MessageBox.Show("Failed to connect to server!");
                 Application.Exit();
             }
         }
@@ -38,36 +38,59 @@ namespace AmonicAirline
             password = Hash.MakeMd5(password);
             using (var session = new Session1Entities())
             {
-                var query = from u in session.Users
-                            where u.Email == username && u.Password == password
-                            select u;
+                var query = session.Users.Where(u => u.Email == username && u.Password == password);
 
-                var result = query.ToList();
-                if (result.Count == 1)
+                var result = query.FirstOrDefault();
+                if (result != null)
                 {
-                    // Sukses Login
-                    // Supaya kalau AdminMainForm ditutup, LoginForm bakal automatis muncul lagi
+                    if (result.Active == true)
+                    {
+                        // Login Success
+                        // Administrator = 1, User = 2
+                        if (result.RoleID == 1)
+                        {
+                            var admin = new AdminMainForm();
+                            // So that if AdminMainForm closed, LoginForm will open again
 
-                    ClearFields.ClearTextBoxes(this);
-                    var admin = new AdminMainForm();
-                    Hide();
-                    admin.ShowDialog();
-                    Show();
+                            Hide();
+                            admin.ShowDialog();
+                            Show();
+                        }
+                        else
+                        {
+                            var user = new UserMainForm($"{result.FirstName} {result.LastName}", result.ID);
+                            // So that if UserMainForm closed, LoginForm will open again
 
-                    failedLoginAttempt = 0;
+                            Hide();
+                            var timeNow = DateTime.Now.TimeOfDay;
+                            session.Activities.Add(new Activity { UserID = result.ID, Date = DateTime.Now.Date, LoginTime = new TimeSpan(timeNow.Hours, timeNow.Minutes, timeNow.Seconds) });
+                            session.SaveChanges();
+                            user.ShowDialog();
+                            Show();
+                        }
+
+                        ClearFields.ClearTextBoxes(this);
+                        failedLoginAttempt = 0;
+                    }
+                    else
+                    {
+                        MessageBox.Show("User suspended by Administrator!");
+                        failedLoginAttempt++;
+                        CheckLoginAttempt();
+                    }
                 }
                 else
                 {
-                    // Gagal Login
+                    // Login Failed
 
-                    MessageBox.Show("Salah Username atau Password!");
+                    MessageBox.Show("Wrong Username or Password by Administrator!");
                     failedLoginAttempt++;
                     CheckLoginAttempt();
                 }
             }
         }
 
-        // Check berapa banyak kali gagal login
+        // Check how many times failed to login
 
         private Timer timer = new Timer()
         {

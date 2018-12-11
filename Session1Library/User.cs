@@ -14,6 +14,12 @@ namespace Session1Library
     
     public partial class User
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public User()
+        {
+            this.Activities = new HashSet<Activity>();
+        }
+    
         public int ID { get; set; }
         public int RoleID { get; set; }
         public string Email { get; set; }
@@ -24,6 +30,8 @@ namespace Session1Library
         public Nullable<System.DateTime> Birthdate { get; set; }
         public Nullable<bool> Active { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Activity> Activities { get; set; }
         public virtual Office Office { get; set; }
         public virtual Role Role { get; set; }
     }

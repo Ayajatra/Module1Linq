@@ -156,7 +156,6 @@
             this.comboBoxOffice.Name = "comboBoxOffice";
             this.comboBoxOffice.Size = new System.Drawing.Size(223, 24);
             this.comboBoxOffice.TabIndex = 3;
-            this.comboBoxOffice.SelectedIndexChanged += new System.EventHandler(this.comboBoxOffice_SelectedIndexChanged);
             // 
             // label5
             // 
@@ -198,6 +197,7 @@
             this.Controls.Add(this.textBoxEmail);
             this.Controls.Add(this.label1);
             this.Name = "AddUserForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Add User";
             this.Load += new System.EventHandler(this.AddUserForm_Load);
             this.ResumeLayout(false);

@@ -2,6 +2,7 @@
 using HashLibrary;
 using Session1Library;
 using System;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -20,61 +21,76 @@ namespace AmonicAirline
         {
             adminMainForm = (AdminMainForm)Owner;
 
-            // TODO: Move it to a method in a class (See: Line 23(AddUserForm), Line 24(AdminMainForm))
-            // Get all Office ID and Title, then set it to comboBoxOffice.
-
             using (var session = new Session1Entities())
             {
-                var query = from o in session.Offices
-                            select new { o.ID, o.Title };
+                var query = session.Offices.Select(o => new { o.ID, o.Title });
+                var result = query.ToList();
 
-                var result = query.ToDictionary(o => o.ID, o => o.Title);
-
-                comboBoxOffice.DataSource = new BindingSource(result, null);
-                comboBoxOffice.DisplayMember = "Value";
-                comboBoxOffice.ValueMember = "Key";
+                comboBoxOffice.DisplayMember = "Title";
+                comboBoxOffice.ValueMember = "ID";
+                comboBoxOffice.DataSource = result;
             }
         }
 
         private void buttonSave_Click(object sender, EventArgs e)
         {
-            using (var session = new Session1Entities())
+            if (CheckFields.CheckIfFieldsIsNotEmpty(this))
             {
                 var email = textBoxEmail.Text;
-                if (session.Users.Where(u => u.Email == email).FirstOrDefault() == null)
+                if (CheckFields.IsValidEmail(email))
                 {
-                    var newUser = new User()
+                    using (var session = new Session1Entities())
                     {
-                        ID = Utilities.GetLastUserID() + 1,
-                        Email = textBoxEmail.Text,
-                        FirstName = textBoxFirstName.Text,
-                        LastName = textBoxLastName.Text,
-                        OfficeID = int.Parse(comboBoxOffice.SelectedValue.ToString()),
-                        Birthdate = dateTimePickerBirthdate.Value,
-                        Password = Hash.MakeMd5(textBoxPassword.Text),
-                        RoleID = 2,
-                        Active = true
-                    };
-                    session.Users.Add(newUser);
-                    session.SaveChanges();
-                    adminMainForm.SetDatagridView();
-                    ClearFields.ClearTextBoxes(this);
-                    dateTimePickerBirthdate.ResetText();
+                        if (session.Users.Where(u => u.Email == email).FirstOrDefault() == null)
+                        {
+                            var newUser = new User()
+                            {
+                                ID = Utilities.GetLastUserID() + 1,
+                                Email = textBoxEmail.Text,
+                                FirstName = textBoxFirstName.Text,
+                                LastName = textBoxLastName.Text,
+                                OfficeID = int.Parse(comboBoxOffice.SelectedValue.ToString()),
+                                Birthdate = dateTimePickerBirthdate.Value,
+                                Password = Hash.MakeMd5(textBoxPassword.Text),
+                                RoleID = 2,
+                                Active = true
+                            };
+                            session.Users.Add(newUser);
+                            try
+                            {
+                                session.SaveChanges();
+                                adminMainForm.SetDatagridView();
+                                ClearFields.ClearTextBoxes(this);
+                                dateTimePickerBirthdate.ResetText();
+                            }
+                            catch (DbEntityValidationException ex)
+                            {
+                                var errorMessages = ex.EntityValidationErrors.SelectMany(x => x.ValidationErrors).Select(x => x.ErrorMessage);
+                                var fullErrorMessage = string.Join("\n", errorMessages);
+                                var exceptionMessage = $"Error : {fullErrorMessage}";
+                                MessageBox.Show(exceptionMessage);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Please enter another email :\nThat email is already used by another user");
+                        }
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Please enter another email :\nThat email is already used by another user");
+                    MessageBox.Show("Please Enter a valid email.");
                 }
+            }
+            else
+            {
+                MessageBox.Show("Please fill all of the fields first.");
             }
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
             Close();
-        }
-
-        private void comboBoxOffice_SelectedIndexChanged(object sender, EventArgs e)
-        {
         }
     }
 }

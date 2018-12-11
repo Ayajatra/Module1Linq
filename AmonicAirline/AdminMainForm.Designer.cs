@@ -115,6 +115,7 @@
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridView.DefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView.Location = new System.Drawing.Point(9, 87);
+            this.dataGridView.MultiSelect = false;
             this.dataGridView.Name = "dataGridView";
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
@@ -131,7 +132,6 @@
             this.dataGridView.Size = new System.Drawing.Size(731, 324);
             this.dataGridView.TabIndex = 1;
             this.dataGridView.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellEnter);
-            this.dataGridView.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dataGridView_RowsAdded);
             // 
             // buttonChangeRole
             // 
@@ -167,6 +167,7 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.panel1);
             this.Name = "AdminMainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AdminMainMenu";
             this.Load += new System.EventHandler(this.AdminMainForm_Load);
             this.panel1.ResumeLayout(false);
@@ -186,6 +187,6 @@
         private System.Windows.Forms.ComboBox comboBoxOffice;
         private System.Windows.Forms.Button buttonChangeRole;
         private System.Windows.Forms.Button buttonSuspendAccount;
-        private System.Windows.Forms.DataGridView dataGridView;
+        public System.Windows.Forms.DataGridView dataGridView;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Session1Library;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -10,10 +9,6 @@ namespace AmonicAirline
 {
     public partial class AdminMainForm : Form
     {
-        // Awalnya ingin mencoba men-bind ke databasenya dengan menghabiskan 1 jam-an di internet untuk mencari caranya
-        // Akhirnya 1 jam-an itu sia-sia karena entah kenapa bindingSource.Reset(true) tidak bekerja (Line 154)
-        private BindingSource bindingSource = new BindingSource();
-
         public AdminMainForm()
         {
             InitializeComponent();
@@ -21,23 +16,23 @@ namespace AmonicAirline
 
         private void AdminMainForm_Load(object sender, EventArgs e)
         {
-            // TODO: Move it to a method in a class (See: Line 23(AddUserForm), Line 24(AdminMainForm))
-            // Get all Office ID and Title, then set it to comboBoxOffice.
-
             using (var session = new Session1Entities())
             {
-                var query = from o in session.Offices
-                            select new { o.ID, o.Title };
+                var query = session.Offices.Select(o => new
+                {
+                    o.ID,
+                    o.Title
+                });
 
-                var result = query.ToDictionary(o => o.ID, o => o.Title);
+                var result = query.ToList();
                 // Add All offices option and then sort it based on ID
 
-                result.Add(0, "All offices");
-                result = result.OrderBy(o => o.Key).ToDictionary(o => o.Key, o => o.Value);
+                result.Add(new { ID = 0, Title = "All Offices" });
+                result = result.OrderBy(o => o.ID).ToList();
 
-                comboBoxOffice.DataSource = new BindingSource(result, null);
-                comboBoxOffice.DisplayMember = "Value";
-                comboBoxOffice.ValueMember = "Key";
+                comboBoxOffice.ValueMember = "ID";
+                comboBoxOffice.DisplayMember = "Title";
+                comboBoxOffice.DataSource = result;
 
                 comboBoxOffice.SelectedIndexChanged += ComboBoxOffice_SelectedIndexChanged;
                 SetDatagridView();
@@ -57,48 +52,67 @@ namespace AmonicAirline
             {
                 if (value != 0)
                 {
-                    var query = from u in session.Users
-                                join r in session.Roles on u.RoleID equals r.ID
-                                join o in session.Offices on u.OfficeID equals o.ID
-                                where u.OfficeID == value
-                                select new
-                                {
-                                    u.ID,
-                                    Name = u.FirstName,
-                                    u.LastName,
-                                    Age = DateTime.Now.Year - u.Birthdate.Value.Year,
-                                    UserRole = r.Title,
-                                    EmailAddress = u.Email,
-                                    Office = o.Title,
-                                    u.Active
-                                };
+                    var query = session.Users.Where(u => u.Office.ID == value).Select(u => new
+                    {
+                        u.ID,
+                        Name = u.FirstName,
+                        u.LastName,
+                        Age = DateTime.Now.Year - u.Birthdate.Value.Year,
+                        UserRole = u.Role.Title,
+                        EmailAddress = u.Email,
+                        Office = u.Office.Title,
+                        u.Active
+                    });
 
-                    bindingSource.DataSource = query.ToList();
-                    dataGridView.DataSource = bindingSource;
+                    dataGridView.DataSource = query.ToList();
                 }
                 else
                 {
-                    var query = from u in session.Users
-                                join r in session.Roles on u.RoleID equals r.ID
-                                join o in session.Offices on u.OfficeID equals o.ID
-                                select new
-                                {
-                                    u.ID,
-                                    Name = u.FirstName,
-                                    u.LastName,
-                                    Age = DateTime.Now.Year - u.Birthdate.Value.Year,
-                                    UserRole = r.Title,
-                                    EmailAddress = u.Email,
-                                    Office = o.Title,
-                                    u.Active
-                                };
+                    var query = session.Users.Select(u => new
+                    {
+                        u.ID,
+                        Name = u.FirstName,
+                        u.LastName,
+                        Age = DateTime.Now.Year - u.Birthdate.Value.Year,
+                        UserRole = u.Role.Title,
+                        EmailAddress = u.Email,
+                        Office = u.Office.Title,
+                        u.Active
+                    });
 
-                    bindingSource.DataSource = query.ToList();
-                    dataGridView.DataSource = bindingSource;
+                    dataGridView.DataSource = query.ToList();
+                }
+            }
+
+            dataGridView.Columns["ID"].Visible = false;
+            dataGridView.Columns["Active"].Visible = false;
+            GiveColor();
+        }
+
+        private void GiveColor()
+        {
+            foreach (DataGridViewRow row in dataGridView.Rows)
+            {
+                // Check if the User is active or not
+                // if not active : Give red color
+
+                // Reset all of the affected cells color
+                row.DefaultCellStyle.BackColor = default(Color);
+                row.DefaultCellStyle.ForeColor = default(Color);
+
+                // Set UserRole Color
+                if (row.Cells["UserRole"].Value.ToString() == "Administrator")
+                {
+                    row.DefaultCellStyle.BackColor = Color.DarkGreen;
+                    row.DefaultCellStyle.ForeColor = Color.White;
                 }
 
-                dataGridView.Columns["ID"].Visible = false;
-                dataGridView.Columns["Active"].Visible = false;
+                // Set Suspended Color
+                if (row.Cells["Active"].Value.ToString() == "False")
+                {
+                    row.DefaultCellStyle.BackColor = Color.DarkRed;
+                    row.DefaultCellStyle.ForeColor = Color.White;
+                }
             }
         }
 
@@ -116,50 +130,37 @@ namespace AmonicAirline
 
         private void buttonChangeRole_Click(object sender, EventArgs e)
         {
+            if (dataGridView.CurrentCell != null)
+            {
+                var editRoleForm = new EditRoleForm();
+                editRoleForm.Owner = this;
+                editRoleForm.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("Please select a cell/row.");
+            }
         }
 
         private void buttonSuspendAccount_Click(object sender, EventArgs e)
         {
-            // Get all of selected rows primary key
-
-            var selectedRowsKey = new List<int>();
-
-            // for selected cells
-
-            int selectedCellCount = dataGridView.GetCellCount(DataGridViewElementStates.Selected);
-            for (int i = 0; i < selectedCellCount; i++)
+            if (dataGridView.CurrentCell != null)
             {
-                selectedRowsKey.Add(int.Parse(dataGridView.SelectedCells[i].OwningRow.Cells["ID"].Value.ToString()));
-            }
-
-            // for selected rows
-
-            int selectedRowsCount = dataGridView.SelectedRows.Count;
-            for (int i = 0; i < selectedRowsCount; i++)
-            {
-                selectedRowsKey.Add(int.Parse(dataGridView.SelectedRows[i].Cells["ID"].Value.ToString()));
-            }
-
-            if (selectedRowsKey.Count != 0)
-            {
-                // Change the value
-
                 using (var session = new Session1Entities())
                 {
-                    foreach (var key in selectedRowsKey)
-                    {
-                        var result = session.Users.SingleOrDefault(u => u.ID == key);
-                        result.Active = result.Active == true ? false : true;
-                    }
+                    // So that there's no LINQ error about
+                    // not being able to convert to LINQ expression
+                    var currentCellID = int.Parse(dataGridView.CurrentCell.OwningRow.Cells["ID"].Value.ToString());
+                    var result = session.Users.SingleOrDefault(u => u.ID == currentCellID);
+                    result.Active = result.Active == true ? false : true;
 
                     session.SaveChanges();
-                    // bindingSource.ResetBindings(true); Kenapa ini tidak bekerja?
                     SetDatagridView();
                 }
             }
             else
             {
-                MessageBox.Show("Please select the row that you want to suspend/unsuspend first!");
+                MessageBox.Show("Please select a cell/row.");
             }
         }
 
@@ -185,29 +186,6 @@ namespace AmonicAirline
         private void labelExit_MouseLeave(object sender, EventArgs e)
         {
             labelExit.BackColor = default(Color);
-        }
-
-        private void dataGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
-        {
-            // Check if the User is active or not
-            // if not active : Give red color
-
-            int rowIndex = e.RowIndex;
-            int rowCount = dataGridView.Rows.Count;
-            while (rowIndex < rowCount)
-            {
-                if (dataGridView.Rows[rowIndex].Cells["Active"].Value.ToString() == "False")
-                {
-                    dataGridView.Rows[rowIndex].DefaultCellStyle.BackColor = Color.DarkRed;
-                    dataGridView.Rows[rowIndex].DefaultCellStyle.ForeColor = Color.White;
-                }
-                else
-                {
-                    dataGridView.Rows[rowIndex].DefaultCellStyle.BackColor = default(Color);
-                    dataGridView.Rows[rowIndex].DefaultCellStyle.ForeColor = default(Color);
-                }
-                rowIndex++;
-            }
         }
 
         private void dataGridView_CellEnter(object sender, DataGridViewCellEventArgs e)
