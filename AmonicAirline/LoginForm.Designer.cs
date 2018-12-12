@@ -98,13 +98,15 @@
             // 
             // buttonExit
             // 
+            this.buttonExit.BackColor = System.Drawing.Color.DarkRed;
             this.buttonExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.buttonExit.ForeColor = System.Drawing.Color.White;
             this.buttonExit.Location = new System.Drawing.Point(233, 195);
             this.buttonExit.Name = "buttonExit";
             this.buttonExit.Size = new System.Drawing.Size(145, 48);
             this.buttonExit.TabIndex = 3;
             this.buttonExit.Text = "Exit";
-            this.buttonExit.UseVisualStyleBackColor = true;
+            this.buttonExit.UseVisualStyleBackColor = false;
             this.buttonExit.Click += new System.EventHandler(this.buttonExit_Click);
             // 
             // labelCooldown

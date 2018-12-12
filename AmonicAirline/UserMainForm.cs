@@ -14,12 +14,6 @@ namespace AmonicAirline
         private Session1Entities session = new Session1Entities();
         private Activity thisUser;
 
-        private Timer timer = new Timer
-        {
-            Interval = 1000,
-            Enabled = true
-        };
-
         public UserMainForm(string _name, int _userID)
         {
             name = _name;
@@ -43,7 +37,7 @@ namespace AmonicAirline
                     a.Date,
                     a.LoginTime,
                     a.LogoutTime,
-                    TimeSpent = $"{(a.LogoutTime.GetValueOrDefault() - a.LoginTime).Hours}:{(a.LogoutTime.GetValueOrDefault() - a.LoginTime).Minutes}:{(a.LogoutTime.GetValueOrDefault() - a.LoginTime).Seconds}",
+                    TimeSpent = $"{(a.LogoutTime.HasValue ? ((a.LogoutTime.GetValueOrDefault() - a.LoginTime).Hours + ":" + (a.LogoutTime.GetValueOrDefault() - a.LoginTime).Minutes + ":" + (a.LogoutTime.GetValueOrDefault() - a.LoginTime).Seconds) : null)}",
                     a.FailReason
                 });
 
@@ -55,10 +49,9 @@ namespace AmonicAirline
             }
             dataGridView.DataSource = result;
             dataGridView.Columns["ID"].Visible = false;
+            SetGridColor();
 
             GetSetTimeSpent();
-            timer.Start();
-            timer.Tick += Timer_Tick;
 
             var crashesCount = result.Where(a => a.FailReason != null).Count();
 
@@ -66,26 +59,35 @@ namespace AmonicAirline
             labelNumberOfCrashes.Text = $"Number of crashes : {crashesCount}";
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            timeSpents = timeSpents.Add(new TimeSpan(0, 0, 1));
-            labelTimeSpent.Text = $"Time Spent on the system : {timeSpents}";
-        }
-
         private TimeSpan timeSpents = new TimeSpan(0, 0, 0);
 
         private void GetSetTimeSpent()
         {
-            try
+            foreach (DataGridViewRow row in dataGridView.Rows)
             {
-                foreach (DataGridViewRow row in dataGridView.Rows)
+                try
                 {
                     timeSpents += TimeSpan.Parse(row.Cells["TimeSpent"].Value.ToString());
                 }
-
-                labelTimeSpent.Text = $"Time spent on the system : {timeSpents}";
+                catch { }
             }
-            catch { };
+
+            labelTimeSpent.Text = $"Time spent on the system : {timeSpents}";
+        }
+
+        private void SetGridColor()
+        {
+            foreach (DataGridViewRow row in dataGridView.Rows)
+            {
+                row.DefaultCellStyle.BackColor = default(Color);
+                row.DefaultCellStyle.ForeColor = default(Color);
+
+                if ((row.Cells["FailReason"].Value + "").ToString() != "")
+                {
+                    row.DefaultCellStyle.BackColor = Color.DarkRed;
+                    row.DefaultCellStyle.ForeColor = Color.White;
+                }
+            }
         }
 
         private void labelExit_MouseEnter(object sender, EventArgs e)
@@ -102,7 +104,9 @@ namespace AmonicAirline
 
         private void labelExit_Click(object sender, EventArgs e)
         {
+            var timeNow = DateTime.Now.TimeOfDay;
             session.Activities.Where(a => a.ID == ID).FirstOrDefault().FailReason = null;
+            session.Activities.Where(a => a.ID == ID).FirstOrDefault().LogoutTime = new TimeSpan(timeNow.Hours, timeNow.Minutes, timeNow.Seconds);
             reportedCrash = true;
             session.SaveChanges();
             Close();
@@ -110,12 +114,11 @@ namespace AmonicAirline
 
         private void UserMainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            var timeNow = DateTime.Now.TimeOfDay;
             if (!reportedCrash)
             {
                 session.Activities.Where(a => a.ID == ID).FirstOrDefault().FailReason = "CRASH";
             }
-            session.Activities.Where(a => a.ID == ID).FirstOrDefault().LogoutTime = new TimeSpan(timeNow.Hours, timeNow.Minutes, timeNow.Seconds);
+
             session.SaveChanges();
         }
     }

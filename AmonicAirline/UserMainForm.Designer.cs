@@ -36,6 +36,8 @@
             this.labelWelcomeMessage = new System.Windows.Forms.Label();
             this.labelTimeSpent = new System.Windows.Forms.Label();
             this.labelNumberOfCrashes = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
@@ -53,6 +55,7 @@
             // 
             this.labelExit.AutoSize = true;
             this.labelExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.labelExit.ForeColor = System.Drawing.Color.DarkRed;
             this.labelExit.Location = new System.Drawing.Point(6, 5);
             this.labelExit.Name = "labelExit";
             this.labelExit.Padding = new System.Windows.Forms.Padding(1);
@@ -124,11 +127,35 @@
             this.labelNumberOfCrashes.TabIndex = 9;
             this.labelNumberOfCrashes.Text = "Number of crashes : ";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.Color.DarkRed;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(538, 94);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(28, 17);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "     ";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.label2.Location = new System.Drawing.Point(572, 94);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(61, 17);
+            this.label2.TabIndex = 11;
+            this.label2.Text = " = Crash";
+            // 
             // UserMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(750, 450);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.dataGridView);
             this.Controls.Add(this.labelNumberOfCrashes);
@@ -154,5 +181,7 @@
         private System.Windows.Forms.Label labelWelcomeMessage;
         private System.Windows.Forms.Label labelTimeSpent;
         private System.Windows.Forms.Label labelNumberOfCrashes;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
     }
 }

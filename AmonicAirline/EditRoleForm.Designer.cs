@@ -164,13 +164,15 @@
             // 
             // buttonCancel
             // 
+            this.buttonCancel.BackColor = System.Drawing.Color.DarkRed;
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.buttonCancel.ForeColor = System.Drawing.Color.White;
             this.buttonCancel.Location = new System.Drawing.Point(204, 214);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(108, 44);
             this.buttonCancel.TabIndex = 7;
             this.buttonCancel.Text = "Cancel";
-            this.buttonCancel.UseVisualStyleBackColor = true;
+            this.buttonCancel.UseVisualStyleBackColor = false;
             this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
             // EditRoleForm

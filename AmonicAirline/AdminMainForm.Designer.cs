@@ -38,6 +38,10 @@
             this.dataGridView = new System.Windows.Forms.DataGridView();
             this.buttonChangeRole = new System.Windows.Forms.Button();
             this.buttonSuspendAccount = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
@@ -56,6 +60,7 @@
             // 
             this.labelExit.AutoSize = true;
             this.labelExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.labelExit.ForeColor = System.Drawing.Color.DarkRed;
             this.labelExit.Location = new System.Drawing.Point(91, 6);
             this.labelExit.Name = "labelExit";
             this.labelExit.Padding = new System.Windows.Forms.Padding(1);
@@ -155,11 +160,59 @@
             this.buttonSuspendAccount.UseVisualStyleBackColor = true;
             this.buttonSuspendAccount.Click += new System.EventHandler(this.buttonSuspendAccount_Click);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.label2.Location = new System.Drawing.Point(633, 46);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(96, 17);
+            this.label2.TabIndex = 13;
+            this.label2.Text = " = Suspended";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.Color.DarkRed;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(599, 46);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(28, 17);
+            this.label1.TabIndex = 12;
+            this.label1.Text = "     ";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.label4.Location = new System.Drawing.Point(633, 67);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(107, 17);
+            this.label4.TabIndex = 15;
+            this.label4.Text = " = Administrator";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.BackColor = System.Drawing.Color.DarkGreen;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.label5.ForeColor = System.Drawing.Color.White;
+            this.label5.Location = new System.Drawing.Point(599, 67);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(28, 17);
+            this.label5.TabIndex = 14;
+            this.label5.Text = "     ";
+            // 
             // AdminMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(752, 478);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonSuspendAccount);
             this.Controls.Add(this.buttonChangeRole);
             this.Controls.Add(this.dataGridView);
@@ -188,5 +241,9 @@
         private System.Windows.Forms.Button buttonChangeRole;
         private System.Windows.Forms.Button buttonSuspendAccount;
         public System.Windows.Forms.DataGridView dataGridView;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
     }
 }

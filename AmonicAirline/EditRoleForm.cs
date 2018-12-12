@@ -1,6 +1,7 @@
 ﻿using FormUtilitiesLibrary;
 using Session1Library;
 using System;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -71,9 +72,19 @@ namespace AmonicAirline
                             rowEdit.OfficeID = int.Parse(comboBoxOffice.SelectedValue.ToString());
                             rowEdit.RoleID = radioButtonAdministrator.Checked ? 1 : 2;
 
-                            session.SaveChanges();
-                            adminMain.SetDatagridView();
-                            Close();
+                            try
+                            {
+                                session.SaveChanges();
+                                adminMain.SetDatagridView();
+                                Close();
+                            }
+                            catch (DbEntityValidationException ex)
+                            {
+                                var errorMessages = ex.EntityValidationErrors.SelectMany(x => x.ValidationErrors).Select(x => x.ErrorMessage);
+                                var fullErrorMessage = string.Join("\n", errorMessages);
+                                var exceptionMessage = $"Error : {fullErrorMessage}";
+                                MessageBox.Show(exceptionMessage);
+                            }
                         }
                         else
                         {

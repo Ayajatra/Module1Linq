@@ -1,5 +1,6 @@
 ﻿using Session1Library;
 using System;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -28,6 +29,10 @@ namespace AmonicAirline
             if (textBoxReason.Text != "" && (radioButtonSoftwareCrash.Checked || radioButtonSystemCrash.Checked))
             {
                 buttonConfirm.Enabled = true;
+            }
+            else
+            {
+                buttonConfirm.Enabled = false;
             }
         }
 
@@ -66,8 +71,18 @@ namespace AmonicAirline
                 var query = session.Activities.Where(a => a.UserID == id && a.FailReason == "CRASH").FirstOrDefault();
 
                 query.FailReason = failText;
-                session.SaveChanges();
-                Close();
+                try
+                {
+                    session.SaveChanges();
+                    Close();
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    var errorMessages = ex.EntityValidationErrors.SelectMany(x => x.ValidationErrors).Select(x => x.ErrorMessage);
+                    var fullErrorMessage = string.Join("\n", errorMessages);
+                    var exceptionMessage = $"Error : {fullErrorMessage}";
+                    MessageBox.Show(exceptionMessage);
+                }
             }
         }
     }
