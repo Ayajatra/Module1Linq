@@ -24,6 +24,7 @@ namespace AmonicAirline
                 MessageBox.Show("Failed to connect to server!");
                 Application.Exit();
             }
+            timer.Tick += Timer_Tick;
         }
 
         private void buttonExit_Click(object sender, EventArgs e)
@@ -83,7 +84,7 @@ namespace AmonicAirline
                 {
                     // Login Failed
 
-                    MessageBox.Show("Wrong Username or Password by Administrator!");
+                    MessageBox.Show("Wrong Username or Password!");
                     failedLoginAttempt++;
                     CheckLoginAttempt();
                 }
@@ -108,7 +109,7 @@ namespace AmonicAirline
                 buttonLogin.Enabled = false;
                 labelCooldown.Text = $"Cooldown : {cooldownTime}s";
                 labelCooldown.Visible = true;
-                timer.Tick += Timer_Tick;
+
                 timer.Start();
             }
         }
